@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>تطبيق النقاط والأرباح</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            padding: 15px;
+            background-color: var(--tg-theme-bg-color, #f4f4f4);
+            color: var(--tg-theme-text-color, #333);
+            direction: rtl;
+        }
+        .header {
+            background-color: var(--tg-theme-secondary-bg-color, #e9e9e9);
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        .points-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--tg-theme-link-color, #007bff);
+        }
+        .section-title {
+            margin: 25px 0 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--tg-theme-text-color, #333);
+        }
+        .task-button, .main-button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .task-button {
+            background-color: #5cb85c; 
+            color: white;
+        }
+        .store-button {
+            background-color: #f0ad4e; 
+            color: white;
+        }
+        .withdraw-button {
+            background-color: var(--tg-theme-button-color, #d9534f); 
+            color: var(--tg-theme-button-text-color, white);
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <p>النقاط المتاحة:</p>
+        <div id="current-points" class="points-display">500 نقطة</div>
+    </div>
+
+    <div class="section-title">إنجاز المهام وكسب النقاط</div>
+    <button class="task-button" onclick="sendAction('watch_video', 50)">شاهد فيديو (50 نقطة)</button>
+    <button class="task-button" onclick="sendAction('browse_site', 20)">تصفح المواقع (20 نقطة)</button>
+    <button class="task-button" onclick="sendAction('complete_task', 100)">تنفيذ مهمة (100 نقطة)</button>
+
+    <div class="section-title">متجر الهواتف والملحقات</div>
+    <button class="store-button" onclick="openStore()">تصفح المتجر (شراء بالنقاط/نقداً)</button>
+    
+    <div class="section-title">سحب الأرباح (CCP)</div>
+    <button class="withdraw-button" onclick="initiateWithdrawal()">سحب (الحد الأدنى 1000 نقطة)</button>
+
+    <p id="message-status" style="margin-top: 15px; color: red;"></p>
+
+    <script>
+        function sendAction(actionType, points = 0) {
+            const currentPoints = 500; 
+            
+            if (actionType === 'withdraw' && currentPoints < 1000) {
+                 document.getElementById('message-status').innerText = 'لا يمكنك السحب: يجب أن يكون لديك 1000 نقطة على الأقل.';
+                 return;
+            }
+
+            const dataToSend = JSON.stringify({
+                action: actionType,
+                points: points,
+                user_id: window.Telegram.WebApp.initDataUnsafe.user.id
+            });
+            
+            window.Telegram.WebApp.sendData(dataToSend);
+            
+            document.getElementById('message-status').innerText = `تم إرسال طلب ${actionType} إلى البوت للمعالجة...`;
+        }
+
+        function initiateWithdrawal() {
+             sendAction('withdraw', 1000); 
+        }
+        
+        function openStore() {
+             document.getElementById('message-status').innerText = 'تم فتح المتجر. (تحتاج إلى تطوير واجهة المتجر هنا)';
+        }
+
+        window.Telegram.WebApp.ready();
+    </script>
+
+</body>
+</html>
